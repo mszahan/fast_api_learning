@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Path
-from model import Todo
+from model import Todo, TodoItem
 
 todo_router = APIRouter()
 
@@ -10,9 +10,11 @@ async def add_todo(todo: Todo) -> dict:
     todo_list.append(todo)
     return {'message': 'Todo added successfully'}
 
+
 @todo_router.get('/todo')
 async def retrive_todo() -> dict:
     return {'todos': todo_list}
+
 
 @todo_router.get('/todo/{todo_id}')
 async def get_single_todo(todo_id: int = 
@@ -26,3 +28,13 @@ async def get_single_todo(todo_id: int =
     return {
         'message': 'The todo id does not exists'
     }
+
+
+@todo_router.put('/todo/{todo_id}')
+async def update_todo(todo_data: TodoItem,
+                      todo_id: int = Path(..., title='The Id of the todo to be updated') ) -> dict:
+    for todo in todo_list:
+        if todo.id == todo_id:
+            todo.item = todo_data.item
+            return {'message': 'Todo updated successfully'}
+    return {'message': 'Invalid Todo Id'}
