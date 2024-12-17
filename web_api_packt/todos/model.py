@@ -1,25 +1,25 @@
-from pydantic import BaseModel
 from typing import List, Optional
+
 from fastapi import Form
+from pydantic import BaseModel
 
 
 class Todo(BaseModel):
-    id: int
+    id: Optional[int]
     item: str
 
-    @classmethod
-    def as_form(
-        cls,
-        item: str = Form(...)
-    ):
-        return cls(item=item)
+    # @classmethod
+    # def as_form(
+    #         cls,
+    #         item: str = Form(...)
+    # ):
+    #     return cls(item=item)
 
-    ## example schema to show in documentation
     class Config:
         schema_extra = {
             "example": {
                 "id": 1,
-                "item": "This is an example schema"
+                "item": "Example schema!"
             }
         }
 
@@ -35,16 +35,19 @@ class TodoItem(BaseModel):
         }
 
 
-##so the todo will be without id just item
 class TodoItems(BaseModel):
     todos: List[TodoItem]
 
     class Config:
         schema_extra = {
-            'example': {
-                'todos': [
-                    {"item": "Example schema 1"},
-                    {"item": "Example schema 2"}
+            "example": {
+                "todos": [
+                    {
+                        "item": "Example schema 1!"
+                    },
+                    {
+                        "item": "Example schema 2!"
+                    }
                 ]
             }
         }

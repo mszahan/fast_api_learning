@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Path, HTTPException, status, Request, Depends
 from fastapi.templating import Jinja2Templates
 from model import Todo, TodoItem, TodoItems
+from fastapi import Form
 
 todo_router = APIRouter()
 
@@ -9,9 +10,11 @@ todo_list = []
 templates = Jinja2Templates(directory='templates/')
 
 
-@todo_router.post('/todo', status_code=201) ## added manually the successfull status
-async def add_todo(request:Request, todo: Todo = Depends(Todo.as_form)):
-    todo.id = len(todo_list) + 1
+@todo_router.post('/todo') ## added manually the successfull status
+# async def add_todo(request:Request, todo: Todo = Depends(Todo.as_form)):
+async def add_todo(request:Request, item: str = Form(...)):
+    # todo.id = len(todo_list) + 1
+    todo = Todo(id=len(todo_list) + 1, item=item)
     todo_list.append(todo)
     # return {'message': 'Todo added successfully'}
     return templates.TemplateResponse('todo.html', {'request':request, 'todos': todo_list})
