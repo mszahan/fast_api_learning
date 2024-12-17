@@ -9,7 +9,7 @@ class User(BaseModel):
     events: Optional[List[Event]] = [] #making it non required field during signup
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "email": "fastapi@packt.com",
                 "username": "strong!!!",
@@ -22,7 +22,7 @@ class UserSignIn(BaseModel):
     email: EmailStr
     password: str
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "email": "fastapi@packt.com",
                 "password": "strong!!!"

@@ -10,7 +10,7 @@ class Event(BaseModel):
     location: str
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "title": "FastApi book Launch",
                 "image": "https://image.com/image.png",
