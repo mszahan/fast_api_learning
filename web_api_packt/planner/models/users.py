@@ -6,7 +6,7 @@ from models.events import Event
 class User(BaseModel):
     email: EmailStr
     password: str
-    events: Optional[List[Event]]
+    events: Optional[List[Event]] = [] #making it non required field during signup
     
     class Config:
         schema_extra = {
@@ -21,10 +21,10 @@ class User(BaseModel):
 class UserSignIn(BaseModel):
     email: EmailStr
     password: str
-
-    schema_extra = {
-        "example": {
-            "email": "fastapi@packt.com",
-            "password": "strong!!!"
+    class Config:
+        schema_extra = {
+            "example": {
+                "email": "fastapi@packt.com",
+                "password": "strong!!!"
+            }
         }
-    }
