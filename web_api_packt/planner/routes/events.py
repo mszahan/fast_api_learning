@@ -39,6 +39,24 @@ async def retrive_event(id: int, session=Depends(get_session)) -> Event:
         detail='Event does not exist'
     )
 
+@event_router.put('/edit/{id}', response_model=Event)
+async def update_event(id: int, new_data: EventUpdate, session=Depends(get_session)) -> Event:
+    event = session.get(Event, id)
+    if event:
+        event_data = new_data.model_dump(exclude_unset=True)
+        for key, value in event_data.items():
+            setattr(event, key, value)
+        session.add(event)
+        session.commit()
+        session.refresh(event)
+
+        return event
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail='Event does not exist'
+    )
+
+
 # @event_router.post('/new')
 # async def create_event(body: Event = Body(...)) -> dict:
 #     events.append(body)
