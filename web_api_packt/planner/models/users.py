@@ -1,12 +1,16 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
+from beanie import Document, Link
 from models.events import Event
 
 
-class User(BaseModel):
+class User(Document):
     email: EmailStr
     password: str
-    events: Optional[List[Event]] = [] #making it non required field during signup
+    events: Optional[List[Link[Event]]] = [] #making it non required field during signup
+
+    class Settings:
+        name = 'users'
     
     class Config:
         json_schema_extra = {
