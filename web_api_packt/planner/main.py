@@ -1,10 +1,22 @@
+# from contextlib import asynccontextmanager
+# from database.connection import init_db
 from fastapi import FastAPI
+from database.connection import Settings
+
 from routes.users import user_router
 from routes.events import event_router
 
 import uvicorn
 
-app = FastAPI()
+
+
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     # Load the ML model
+#     await init_db()     
+#     yield
+
+app = FastAPI()    
 
 ## register routes
 app.include_router(user_router, prefix='/user')

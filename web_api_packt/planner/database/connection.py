@@ -10,12 +10,16 @@ from models.users import User
 
 
 
+
 class Settings(BaseSettings):
-    DATABASE_URL: Optional [str] = None
+
+
+    DATABASE_URL: Optional[str] = None
+
 
     async def initialize_database(self):
         client = AsyncIOMotorClient(self.DATABASE_URL)
-        await init_beanie(database=client.get_default_database,
+        await init_beanie(database=client.get_default_database('planner'),
                           document_models=[Event, User])
         
     class Config:
