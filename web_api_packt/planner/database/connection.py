@@ -12,18 +12,15 @@ from models.users import User
 
 
 class Settings(BaseSettings):
-
-
-    DATABASE_URL: Optional[str] = None
-
+    DATABASE_URL: Optional[str] = 'mongodb://localhost:27017/'
 
     async def initialize_database(self):
         client = AsyncIOMotorClient(self.DATABASE_URL)
         await init_beanie(database=client.get_default_database('planner'),
                           document_models=[Event, User])
-        
+
     class Config:
-        env_file = '.env'
+        env_file = ".env"
     
 
 class Database:
