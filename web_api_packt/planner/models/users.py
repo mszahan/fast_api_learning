@@ -21,14 +21,17 @@ class User(Document):
                     }
                 }
 
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
 
-class UserSignIn(BaseModel):
-    email: EmailStr
-    password: str
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "email": "fastapi@packt.com",
-                "password": "strong!!!"
-            }
-        }
+# class UserSignIn(BaseModel):
+#     email: EmailStr
+#     password: str
+#     class Config:
+#         json_schema_extra = {
+#             "example": {
+#                 "email": "fastapi@packt.com",
+#                 "password": "strong!!!"
+#             }
+#         }
