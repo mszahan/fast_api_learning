@@ -13,6 +13,7 @@ from models.users import User
 
 class Settings(BaseSettings):
     DATABASE_URL: Optional[str] = 'mongodb://localhost:27017/'
+    SECRET_KEY:Optional[str]
 
     async def initialize_database(self):
         client = AsyncIOMotorClient(self.DATABASE_URL)
