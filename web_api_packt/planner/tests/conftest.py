@@ -29,5 +29,5 @@ async def default_client():
 
         ## clean up resources
         await Event.find_all().delete()
-        await User.find_all().delete()
+        # await User.find_all().delete()
     
