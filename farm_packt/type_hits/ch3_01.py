@@ -7,9 +7,9 @@ def print_name_x_times(name:str, times:int) -> None:
 
 # print_name_x_times(2, 'hola')
 
-text:str = 'John'
+text : str = 'John'
 
 ## if you need multiple type you can use Union
 x: Union[str, int]
 ## you can do this too with pip | character
-x: str | int
+y: str | int
