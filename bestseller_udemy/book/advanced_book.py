@@ -63,6 +63,22 @@ async def book_list():
     return books
 
 
+@app.get('/books/{book_id}')
+async def book_detail(book_id: int):
+    for book in books:
+        if book.id == book_id:
+            return book
+
+
+@app.get('/book') # /books will override the book_list endpoint and /books/something will behave differently for param in book detail
+async def book_by_rating(book_rating: int):
+    book_list = []
+    for book in books:
+        if book.rating == book_rating:
+            book_list.append(book)
+    return book_list
+
+
 @app.post('/create-book')
 async def creat_book(request_book: BookRequest):
     new_book = Book(**request_book.model_dump())
