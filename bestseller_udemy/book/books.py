@@ -22,8 +22,29 @@ async def read_all_books():
 async def favorite_book():
     return BOOK[-1]
 
+# path parameter
 @app.get('/books/{book_title}')
 async def read_book(book_title:str):
     for book in BOOK:
         if book['title'].casefold() == book_title.casefold():
             return book
+
+# just query parameter
+@app.get('/book')
+async def book_by_category(category:str):
+    book_list = []
+    for book in BOOK:
+        if book.get('category').casefold() == category.casefold():
+            book_list.append(book)
+    return book_list
+
+# with both path and query parameter
+@app.get('/book/{author_name}')
+async def book_by_author_category(author_name:str, category:str):
+    book_list = []
+    for book in BOOK:
+        if book.get('author').casefold() == author_name.casefold() and \
+            book.get('category').casefold() == category.casefold():
+            book_list.append(book)
+    return book_list
+
