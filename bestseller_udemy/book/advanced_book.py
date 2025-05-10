@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
+from typing import Optional
 
 app = FastAPI()
 
@@ -18,6 +20,27 @@ class Book:
         self.description = description
         self.rating = rating
 
+class BookRequest(BaseModel):
+    # id: Optional[int] = None
+    id: Optional[int] = Field(description='ID is not needed on create', default=None)
+    title: str = Field(min_length=3)
+    author: str = Field(min_length=3)
+    description: str = Field(min_length=5, max_length=100)
+    rating: int = Field(gt=0, lt=6)
+
+    # this is just for the schema on the documentation
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "title": "python for everybody",
+                "author": "Dr. chuck",
+                "description": "Python beginner friendly book",
+                "rating": 5
+            }
+        }
+    }
+
+
 books = [
     Book(1, 'Web api with fastapi', 'dakota', 'fastapi beginer book', 4),
     Book(2, 'Farm stack web development', 'alex', 'full stack fastapi book', 5),
@@ -27,7 +50,13 @@ books = [
     Book(6, 'Mastering python', 'alex', 'Advanced book of python', 4),
 ]
         
-
+def handle_book_id(book: Book):
+    # if len(books) > 0:
+    #     book.id = books[-1].id +1
+    # else:
+    #     book.id = 1
+    book.id = 1 if len(books) == 0 else books[-1].id + 1
+    return book
 
 @app.get('/books')
 async def book_list():
@@ -35,5 +64,8 @@ async def book_list():
 
 
 @app.post('/create-book')
-async def creat_book(request_book=Body()):
-    books.append(request_book)
+async def creat_book(request_book: BookRequest):
+    new_book = Book(**request_book.model_dump())
+    new_book = handle_book_id(new_book)
+    books.append(new_book)
+
