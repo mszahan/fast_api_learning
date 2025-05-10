@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Path, Query, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
+from starlette import status
 
 app = FastAPI()
 
@@ -62,12 +63,12 @@ def handle_book_id(book: Book):
     book.id = 1 if len(books) == 0 else books[-1].id + 1
     return book
 
-@app.get('/books')
+@app.get('/books', status_code=status.HTTP_200_OK)
 async def book_list():
     return books
 
 
-@app.get('/books/{book_id}')
+@app.get('/books/{book_id}', status_code=status.HTTP_200_OK)
 async def book_detail(book_id: int = Path(gt=0)):
     for book in books:
         if book.id == book_id:
@@ -75,7 +76,7 @@ async def book_detail(book_id: int = Path(gt=0)):
     raise HTTPException(status_code=404, detail='No book found')
 
 
-@app.get('/books-rating') # /books will override the book_list endpoint and /books/something will behave differently for param in book detail
+@app.get('/books-rating', status_code=status.HTTP_200_OK) # /books will override the book_list endpoint and /books/something will behave differently for param in book detail
 async def book_by_rating(book_rating: int = Query(gt=0, lt=6)):
     book_list = []
     for book in books:
@@ -84,7 +85,7 @@ async def book_by_rating(book_rating: int = Query(gt=0, lt=6)):
     return book_list
 
 
-@app.get('/books-published')
+@app.get('/books-published', status_code=status.HTTP_200_OK)
 async def book_by_pulished(published: int = Query(gt=1999, lt=2030)):
     book_list = []
     for book in books:
@@ -93,14 +94,14 @@ async def book_by_pulished(published: int = Query(gt=1999, lt=2030)):
     return book_list
 
 
-@app.post('/create-book')
+@app.post('/create-book', status_code=status.HTTP_201_CREATED)
 async def creat_book(request_book: BookRequest):
     new_book = Book(**request_book.model_dump())
     new_book = handle_book_id(new_book)
     books.append(new_book)
 
 
-@app.put('/books/update-book')
+@app.put('/books/update-book', status_code=status.HTTP_204_NO_CONTENT)
 async def update_book(book: BookRequest):
     book_changed = False
     for n in range(len(books)):
@@ -111,7 +112,7 @@ async def update_book(book: BookRequest):
         raise HTTPException(status_code=404, detail='No book found to update')
 
 
-@app.delete('/books/{book_id}')
+@app.delete('/books/{book_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(book_id: int = Path(gt=0)):
     book_deleted = False
     for n in range(len(books)):
