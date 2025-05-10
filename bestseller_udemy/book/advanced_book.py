@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path
+from fastapi import FastAPI, Path, Query
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -75,7 +75,7 @@ async def book_detail(book_id: int = Path(gt=0)):
 
 
 @app.get('/books-rating') # /books will override the book_list endpoint and /books/something will behave differently for param in book detail
-async def book_by_rating(book_rating: int):
+async def book_by_rating(book_rating: int = Query(gt=0, lt=6)):
     book_list = []
     for book in books:
         if book.rating == book_rating:
@@ -84,7 +84,7 @@ async def book_by_rating(book_rating: int):
 
 
 @app.get('/books-published')
-async def book_by_pulished(published: int):
+async def book_by_pulished(published: int = Query(gt=1999, lt=2030)):
     book_list = []
     for book in books:
         if book.published == published:
