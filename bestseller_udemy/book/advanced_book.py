@@ -12,13 +12,15 @@ class Book:
     author: str
     description: str
     rating: int
+    published: int
 
-    def __init__(self, id, title, author, description, rating):
+    def __init__(self, id, title, author, description, rating, published):
         self.id = id
         self.title = title
         self.author = author
         self.description = description
         self.rating = rating
+        self.published = published
 
 class BookRequest(BaseModel):
     # id: Optional[int] = None
@@ -27,6 +29,7 @@ class BookRequest(BaseModel):
     author: str = Field(min_length=3)
     description: str = Field(min_length=5, max_length=100)
     rating: int = Field(gt=0, lt=6)
+    published: int = Field(gt=1999, lt=2030)
 
     # this is just for the schema on the documentation
     model_config = {
@@ -35,19 +38,20 @@ class BookRequest(BaseModel):
                 "title": "python for everybody",
                 "author": "Dr. chuck",
                 "description": "Python beginner friendly book",
-                "rating": 5
+                "rating": 5,
+                "published":2004
             }
         }
     }
 
 
 books = [
-    Book(1, 'Web api with fastapi', 'dakota', 'fastapi beginer book', 4),
-    Book(2, 'Farm stack web development', 'alex', 'full stack fastapi book', 5),
-    Book(3, 'django 5 by example', 'luna', 'Advanced django book from packt', 5),
-    Book(4, 'Learning python', 'rebecca', 'python book for beginner', 4),
-    Book(5, 'OOP with python', 'dakota', 'Objec oriented programming in python', 5),
-    Book(6, 'Mastering python', 'alex', 'Advanced book of python', 4),
+    Book(1, 'Web api with fastapi', 'dakota', 'fastapi beginer book', 4, 2002),
+    Book(2, 'Farm stack web development', 'alex', 'full stack fastapi book', 5, 2005),
+    Book(3, 'django 5 by example', 'luna', 'Advanced django book from packt', 5, 2000),
+    Book(4, 'Learning python', 'rebecca', 'python book for beginner', 4, 2002),
+    Book(5, 'OOP with python', 'dakota', 'Objec oriented programming in python', 5, 2005),
+    Book(6, 'Mastering python', 'alex', 'Advanced book of python', 4, 2004),
 ]
         
 def handle_book_id(book: Book):
@@ -70,11 +74,20 @@ async def book_detail(book_id: int):
             return book
 
 
-@app.get('/book') # /books will override the book_list endpoint and /books/something will behave differently for param in book detail
+@app.get('/books-rating') # /books will override the book_list endpoint and /books/something will behave differently for param in book detail
 async def book_by_rating(book_rating: int):
     book_list = []
     for book in books:
         if book.rating == book_rating:
+            book_list.append(book)
+    return book_list
+
+
+@app.get('/books-published')
+async def book_by_pulished(published: int):
+    book_list = []
+    for book in books:
+        if book.published == published:
             book_list.append(book)
     return book_list
 
