@@ -6,6 +6,6 @@ DATABASE_URL = 'sqlite:///./todo.db'
 
 engine = create_engine(DATABASE_URL, connect_args={'check_same_thread': False})
 
-SessionLocal = sessionmaker(atucommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
