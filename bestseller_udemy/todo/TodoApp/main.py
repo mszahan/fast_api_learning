@@ -52,3 +52,19 @@ async def create_todo(db:db_dependency, todo_request: TodoRequest):
     todo = Todo(**todo_request.model_dump())
     db.add(todo) # this line stages doesn't save on database
     db.commit() # this line makes the commit and save data on database
+
+
+@app.put('/todo/{todo_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def update_todo(db: db_dependency, 
+                       todo_request: TodoRequest, # this line needs to be above path validation
+                       todo_id: int = Path(gt=0)):
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    if todo is None:
+        raise HTTPException(status_code=404, detail='No todo found')
+    todo.title = todo_request.title
+    todo.description = todo_request.description
+    todo.priority = todo_request.priority
+    todo.complete = todo_request.complete
+    
+    db.add(todo)
+    db.commit()
