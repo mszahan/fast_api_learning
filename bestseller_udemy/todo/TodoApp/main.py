@@ -3,10 +3,10 @@ from starlette import status
 from pydantic import BaseModel, Field
 from typing import Annotated
 from sqlalchemy.orm import Session
-from . import models
-from .models import Todo
-from .database import engine, SessionLocal
-from .routers import auth
+import models
+from models import Todo
+from database import engine, SessionLocal
+from routers import auth
 
 
 app = FastAPI()
