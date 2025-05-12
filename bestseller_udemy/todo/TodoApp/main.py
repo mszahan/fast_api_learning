@@ -6,11 +6,14 @@ from sqlalchemy.orm import Session
 from . import models
 from .models import Todo
 from .database import engine, SessionLocal
+from .routers import auth
 
 
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
+
+app.include_router(auth.router)
 
 # it create connection with dabase and when request is done it closes the connection
 def get_db():
