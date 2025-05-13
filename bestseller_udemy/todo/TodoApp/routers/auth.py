@@ -1,7 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, Path
+from starlette import status
+from typing import Annotated
 from pydantic import BaseModel
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 from models import User
+from database import SessionLocal
 
 
 router = APIRouter()
@@ -18,9 +22,22 @@ class UserRequest(BaseModel):
     role: str
 
 
+# it create connection with dabase and when request is done it closes the connection
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-@router.post('/auth')
-async def create_user(user_request: UserRequest):
+# it's simmilar to db: Session = Depends(get_db)
+# which return database in db variable
+db_dependency = Annotated[Session, Depends(get_db)]
+
+
+
+@router.post('/auth', status_code=status.HTTP_201_CREATED)
+async def create_user(db: db_dependency, user_request: UserRequest):
     user = User(
         email=user_request.email,
         username=user_request.username,
@@ -32,4 +49,5 @@ async def create_user(user_request: UserRequest):
         is_active=True
 
     )
-    return user
+    db.add(user)
+    db.commit()
