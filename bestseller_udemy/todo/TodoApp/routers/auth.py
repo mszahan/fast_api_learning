@@ -1,11 +1,35 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
+from passlib.context import CryptContext
+from models import User
 
 
 router = APIRouter()
 
+bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+
+
+class UserRequest(BaseModel):
+    email: str
+    username: str
+    first_name: str
+    last_name: str
+    password: str
+    role: str
 
 
 
-@router.get('/auth')
-async def get_user():
-    return {'user': 'authenticate'}
+@router.post('/auth')
+async def create_user(user_request: UserRequest):
+    user = User(
+        email=user_request.email,
+        username=user_request.username,
+        first_name=user_request.first_name,
+        last_name=user_request.last_name,
+        role=user_request.role,
+        # hasing the password the passing it to the database stage
+        hashed_password=bcrypt_context.hash(user_request.password),
+        is_active=True
+
+    )
+    return user
