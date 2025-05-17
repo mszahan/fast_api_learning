@@ -5,6 +5,7 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 from models import Todo
 from database import SessionLocal
+from .auth import get_current_user
 
 
 router = APIRouter()
@@ -21,6 +22,7 @@ def get_db():
 # it's simmilar to db: Session = Depends(get_db)
 # which return database in db variable
 db_dependency = Annotated[Session, Depends(get_db)]
+user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
 class TodoRequest(BaseModel):
@@ -46,8 +48,10 @@ async def todo_detail(db: db_dependency, todo_id: int = Path(gt=0)):
 
 
 @router.post('/todo', status_code=status.HTTP_201_CREATED)
-async def create_todo(db:db_dependency, todo_request: TodoRequest):
-    todo = Todo(**todo_request.model_dump())
+async def create_todo(user: user_dependency, db:db_dependency, todo_request: TodoRequest):
+    if user is None:
+        raise HTTPException(status_code=401, detail='authentication failed')
+    todo = Todo(**todo_request.model_dump(), owner_id=user.get('id'))
     db.add(todo) # this line stages doesn't save on database
     db.commit() # this line makes the commit and save data on database
 

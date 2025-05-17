@@ -11,14 +11,17 @@ from models import User
 from database import SessionLocal
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/auth',
+    tags=['authentication']
+)
 
 SECRET_KEY = 'f64443970b7dd92384234ec99276b638a38e5d26161fc6f8255599c1b01b6588'
 ALGORITHM = 'HS256'
 
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
 
 class UserRequest(BaseModel):
     email: str
@@ -78,7 +81,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
                                 detail='Could not validate user')
 
 
-@router.post('/auth', status_code=status.HTTP_201_CREATED)
+@router.post('', status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, user_request: UserRequest):
     user = User(
         email=user_request.email,
@@ -100,6 +103,7 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
                                  db: db_dependency):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
-        return 'Failed authentication'
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail='Could not validate user')
     token = create_access_token(user.username, user.id, timedelta(minutes=20))
     return {'access_token': token, 'token_type':'bearer'}
