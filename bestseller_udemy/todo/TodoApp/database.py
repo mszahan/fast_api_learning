@@ -10,6 +10,11 @@ from sqlalchemy.ext.declarative import declarative_base
 DATABASE_URL = 'postgresql://postgres:1294@localhost/tododb'
 engine = create_engine(DATABASE_URL)
 
+#for postgresql
+# DATABASE_URL = 'mysql+pymysql://root:password@localhost:3306/database_name'
+# engine = create_engine(DATABASE_URL)
+
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
