@@ -57,7 +57,17 @@ async def change_password(user: user_dependency, db: db_dependency,
     db.commit()
 
 
-    
+
+
+@router.put('/phone/{phone_number}', status_code=status.HTTP_200_OK)
+async def update_phone_number(user: user_dependency, db: db_dependency, phone_number:str):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication failed')
+    user = db.query(User).filter(User.id == user.get('id')).first()
+    user.phone_number = phone_number
+    db.add(user)
+    db.commit()
+
 
 
 
