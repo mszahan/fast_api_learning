@@ -7,3 +7,4 @@ python-jose[cr
 psycopg2-binary
 pymysql
 alembic
+pytest
