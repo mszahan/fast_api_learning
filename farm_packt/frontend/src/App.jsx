@@ -2,6 +2,7 @@ import "./App.css";
 import { useState } from "react";
 import Header from "./component/Header";
 import Card from "./component/Card";
+import Users from "./component/Users";
 
 function App() {
   const data = [
@@ -41,6 +42,7 @@ function App() {
             <Card car={el} key={el.id} />
           ))}
       </div>
+      <Users />
     </div>
   );
 }
