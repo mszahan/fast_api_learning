@@ -1,3 +1,9 @@
 {
-    "users":[]
+    "users": [
+        {
+            "username": "mszahan",
+            "password": "$2b$12$PKatM8bNndTb9lHwavpznubIhrcBbZIhR7A4Db4XDvCHIb5Lm.T1K",
+            "id": "df388574-74e3-496b-bbd9-62d172ba0a2a"
+        }
+    ]
 }

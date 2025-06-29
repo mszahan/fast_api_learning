@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from authentication import AuthHandler 
-from models import UserBase, UserIn, UserOut, UsersList
+from models import UserBase, UserIn, UserOut, UserList
 
 
 router = APIRouter()
@@ -37,3 +37,9 @@ async def login(request: Request, loginUser: UserIn = Body(...)) -> str:
     token = auth_handler.encode_token(str(user['id']), user['username'])
     response = JSONResponse(content={'token': token})
     return response
+
+
+@router.get('/list', response_description='login protected user list')
+async def list_users(request: Request, user_data=Depends(auth_handler.auth_wrapper)):
+    users = json.loads(open('users.json').read())['users']
+    return UserList(users=users)
