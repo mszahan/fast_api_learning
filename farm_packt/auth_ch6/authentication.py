@@ -25,7 +25,7 @@ class AuthHandler:
         }
         return jwt.encode(payload, self.secret, algorithm='HS256')
 
-    def decode_toke(self, token: str):
+    def decode_token(self, token: str):
         try:
             payload = jwt.decode(token, self.secret, algorithms='HS256')
             return payload['sub']
@@ -36,4 +36,5 @@ class AuthHandler:
             raise HTTPException(status_code=401, detail='Invalid token')
 
     def auth_wrapper(self, auth: HTTPAuthorizationCredentials = Security(security)) -> dict:
-        return self.decode_toke(auth.credentials)
+        print("Token received:", auth.credentials)
+        return self.decode_token(auth.credentials)

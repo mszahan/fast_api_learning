@@ -2,8 +2,12 @@ import "./App.css";
 import { useState } from "react";
 import Header from "./component/Header";
 import Card from "./component/Card";
-import Users from "./component/Users";
+// import Users from "./component/Users";
 import { AuthProvider } from "./component/auth/AuthContext";
+import Register from "./component/auth/Register";
+import Login from "./component/auth/Login";
+import Message from "./component/auth/Message";
+import Users from "./component/auth/Users";
 
 function App() {
   const data = [
@@ -20,12 +24,20 @@ function App() {
   ];
 
   const [budget, setBudget] = useState(20000);
+  const [showLogin, setShowLogin] = useState(true);
 
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
-      <div className="bg-blue-200 flex flex-col justify-center itemscenter m-5">
+      <div className="bg-blue-100 flex flex-col justify-center itemscenter m-5 p-5 rounded-2xl">
         <AuthProvider>
           <h1 className="text-2xl text-blue-800"> Simple Auth App </h1>
+          {showLogin ? <Login /> : <Register />}
+          <button onClick={() => setShowLogin(!showLogin)}>
+            {" "}
+            {showLogin ? "Register" : "Login"}{" "}
+          </button>
+          <hr />
+          <Users />
         </AuthProvider>
       </div>
       <Header />
@@ -48,7 +60,7 @@ function App() {
             <Card car={el} key={el.id} />
           ))}
       </div>
-      <Users />
+      {/* <Users /> */}
     </div>
   );
 }

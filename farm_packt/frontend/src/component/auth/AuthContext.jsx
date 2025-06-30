@@ -9,7 +9,7 @@ const AuthProvider = ({ children }) => {
 
   const register = async (username, password) => {
     try {
-      const resposen = await fetch("http://localhost:8000/ursers/register", {
+      const resposen = await fetch("http://localhost:8000/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
