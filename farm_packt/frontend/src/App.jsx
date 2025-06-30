@@ -3,6 +3,7 @@ import { useState } from "react";
 import Header from "./component/Header";
 import Card from "./component/Card";
 import Users from "./component/Users";
+import { AuthProvider } from "./component/auth/AuthContext";
 
 function App() {
   const data = [
@@ -22,6 +23,11 @@ function App() {
 
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
+      <div className="bg-blue-200 flex flex-col justify-center itemscenter m-5">
+        <AuthProvider>
+          <h1 className="text-2xl text-blue-800"> Simple Auth App </h1>
+        </AuthProvider>
+      </div>
       <Header />
       <div className="mb-4 space-y-5">
         <h2>Your budget is {budget} </h2>
