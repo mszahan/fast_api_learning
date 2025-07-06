@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
@@ -6,6 +6,29 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [jwt, setJwt] = useState(null);
   const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    const storedJwt = localStorage.getItem("jwt");
+
+    if (storedJwt) {
+      setJwt(storedJwt);
+      fetch("http://localhost:8000/users/me", {
+        headers: {
+          Authorization: `Bearer ${storedJwt}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.username) {
+            setUser({ username: data.username });
+            setMessage(`Welcome back ${data.username}`);
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem("jwt");
+        });
+    }
+  }, []);
 
   const register = async (username, password) => {
     try {
@@ -33,7 +56,8 @@ const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    setJwt(null);
+    setJwt("");
+    localStorage.removeItem("jwt");
     setMessage("Logout successful");
   };
 
@@ -49,6 +73,7 @@ const AuthProvider = ({ children }) => {
     if (response.ok) {
       const data = await response.json();
       setJwt(data.token);
+      localStorage.setItem("jwt", data.token);
       setUser({ username });
       setMessage(
         `login successful : token ${data.token.slice(

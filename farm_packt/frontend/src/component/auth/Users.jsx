@@ -4,6 +4,7 @@ import { useAuth } from "./useAuth";
 const Users = () => {
   const { jwt, logout } = useAuth();
   const [users, setUsers] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -14,6 +15,9 @@ const Users = () => {
       });
       //   console.log(jwt);
       const data = await response.json();
+      if (!response.ok) {
+        setError(data.detail);
+      }
       setUsers(data.users);
     };
     if (jwt) {
@@ -38,7 +42,7 @@ const Users = () => {
           </button>
         </div>
       ) : (
-        <p>Loading...</p>
+        <p>{error}</p>
       )}
     </div>
   );
