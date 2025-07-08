@@ -42,3 +42,7 @@ class CarModel(BaseModel):
     @classmethod
     def check_make_case(cls, v: str) -> str:
         return v.title()
+
+
+class CarCollection(BaseModel):
+    cars: List[CarModel]
