@@ -25,23 +25,13 @@ class CarModel(BaseModel):
         return v.title()
 
 
-class CarModel(BaseModel):
-    brand: Optional[str] = Field(...)
-    make: Optional[str] = Field(...)
-    year: Optional[int] = Field(..., gt=1970, lt=2025)
-    cm3: Optional[int] = Field(..., gt=0, lt=5000)
-    km: Optional[int] = Field(..., gt=0, lt=500 * 1000)
-    price: Optional[int] = Field(..., gt=0, lt=100 * 1000)
-
-    @field_validator('brand')
-    @classmethod
-    def check_brand_case(cls, v: str) -> str:
-        return v.title()
-
-    @field_validator('make')
-    @classmethod
-    def check_make_case(cls, v: str) -> str:
-        return v.title()
+class UpdateCarModel(BaseModel):
+    brand: Optional[str] = None
+    make: Optional[str] = None
+    year: Optional[int] = Field(..., gt=1970, lt=2025, default=None)
+    cm3: Optional[int] = Field(..., gt=0, lt=5000, default=None)
+    km: Optional[int] = Field(..., gt=0, lt=500 * 1000, default=None)
+    price: Optional[int] = Field(..., gt=0, lt=100 * 1000, default=None)
 
 
 class CarCollection(BaseModel):
