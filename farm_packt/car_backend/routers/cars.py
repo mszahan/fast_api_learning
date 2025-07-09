@@ -1,21 +1,66 @@
-from fastapi import APIRouter, Body, Request, status, HTTPException
-from fastapi.responses import Response
 from bson import ObjectId
+from fastapi import (APIRouter, Body, File, Form,
+                     UploadFile, Request, status, HTTPException)
+from fastapi.responses import Response
 from pymongo import ReturnDocument
+import cloudinary
+from cloudinary import uploader  # noqa: F401
+from config import BaseConfig
 from models import CarModel, CarCollection, UpdateCarModel, CarCollectionPagination
 
 
+settings = BaseConfig()
 router = APIRouter()
 CARS_PER_PAGE = 10
 
 
+cloudinary.config(
+    cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+    api_key=settings.CLOUDINARY_API_KEY,
+    api_secret=settings.CLOUDINARY_SECRET_KEY,
+)
+
+
+# @router.post('/',
+#              response_description='Add new car',
+#              response_model=CarModel,
+#              status_code=status.HTTP_201_CREATED,
+#              response_model_by_alias=False,
+#              )
+# async def add_car(request: Request, car: CarModel = Body(...)):
+#     cars = request.app.db['cars']
+#     document = car.model_dump(by_alias=True, exclude=['id'])
+#     inserted = await cars.insert_one(document)
+#     return await cars.find_one({'_id': inserted.inserted_id})
+
+
 @router.post('/',
-             response_description='Add new car',
+             response_description='Add new car with picture',
              response_model=CarModel,
-             status_code=status.HTTP_201_CREATED,
-             response_model_by_alias=False,
+             status_code=status.HTTP_201_CREATED
              )
-async def add_car(request: Request, car: CarModel = Body(...)):
+async def add_car(
+    request: Request,
+    brand: str = Form('brand'),
+    make: str = Form('make'),
+    year: int = Form('year'),
+    cm3: int = Form('cm3'),
+    km: int = Form('km'),
+    price: int = Form('price'),
+    picture: UploadFile = File('picture'),
+):
+    cloudinary_image = cloudinary.uploader.upload(
+        picture.file, crop='fill', width=800)
+    picture_url = cloudinary_image['url']
+    car = CarModel(
+        brand=brand,
+        make=make,
+        year=year,
+        cm3=cm3,
+        km=km,
+        price=price,
+        picture_url=picture_url,
+    )
     cars = request.app.db['cars']
     document = car.model_dump(by_alias=True, exclude=['id'])
     inserted = await cars.insert_one(document)
