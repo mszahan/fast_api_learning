@@ -1,16 +1,18 @@
 from bson import ObjectId
 from fastapi import (APIRouter, Body, File, Form,
-                     UploadFile, Request, status, HTTPException)
+                     UploadFile, Request, status, HTTPException, Depends)
 from fastapi.responses import Response
 from pymongo import ReturnDocument
 import cloudinary
 from cloudinary import uploader  # noqa: F401
 from config import BaseConfig
 from models import CarModel, CarCollection, UpdateCarModel, CarCollectionPagination
+from authentication import AuthHandler
 
 
 settings = BaseConfig()
 router = APIRouter()
+auth_handler = AuthHandler()
 CARS_PER_PAGE = 10
 
 
@@ -48,9 +50,10 @@ async def add_car(
     km: int = Form('km'),
     price: int = Form('price'),
     picture: UploadFile = File('picture'),
+    user: str = Depends(auth_handler.auth_wrapper)
 ):
     cloudinary_image = cloudinary.uploader.upload(
-        picture.file, crop='fill', width=800)
+        picture.file, folder='cars', crop='fill', width=800)
     picture_url = cloudinary_image['url']
     car = CarModel(
         brand=brand,
@@ -60,6 +63,7 @@ async def add_car(
         km=km,
         price=price,
         picture_url=picture_url,
+        user_id=user['user_id']
     )
     cars = request.app.db['cars']
     document = car.model_dump(by_alias=True, exclude=['id'])
