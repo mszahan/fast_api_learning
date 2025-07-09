@@ -28,11 +28,16 @@ class CarModel(BaseModel):
 class UpdateCarModel(BaseModel):
     brand: Optional[str] = None
     make: Optional[str] = None
-    year: Optional[int] = Field(..., gt=1970, lt=2025, default=None)
-    cm3: Optional[int] = Field(..., gt=0, lt=5000, default=None)
-    km: Optional[int] = Field(..., gt=0, lt=500 * 1000, default=None)
-    price: Optional[int] = Field(..., gt=0, lt=100 * 1000, default=None)
+    year: Optional[int] = Field(gt=1970, lt=2025, default=None)
+    cm3: Optional[int] = Field(gt=0, lt=5000, default=None)
+    km: Optional[int] = Field(gt=0, lt=500 * 1000, default=None)
+    price: Optional[int] = Field(gt=0, lt=100 * 1000, default=None)
 
 
 class CarCollection(BaseModel):
     cars: List[CarModel]
+
+
+class CarCollectionPagination(CarCollection):
+    page: int = Field(ge=1, default=1)
+    has_more: bool

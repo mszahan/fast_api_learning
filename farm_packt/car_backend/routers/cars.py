@@ -2,10 +2,11 @@ from fastapi import APIRouter, Body, Request, status, HTTPException
 from fastapi.responses import Response
 from bson import ObjectId
 from pymongo import ReturnDocument
-from models import CarModel, CarCollection, UpdateCarModel
+from models import CarModel, CarCollection, UpdateCarModel, CarCollectionPagination
 
 
 router = APIRouter()
+CARS_PER_PAGE = 10
 
 
 @router.post('/',
@@ -22,18 +23,29 @@ async def add_car(request: Request, car: CarModel = Body(...)):
 
 
 @router.get('/',
-            response_description='List all cars',
-            response_model=CarCollection,
+            response_description='List all cars, paginated',
+            response_model=CarCollectionPagination,
             response_model_by_alias=False,
             )
-async def list_cars(request: Request):
+async def list_cars(request: Request, page: int = 1, limit: int = CARS_PER_PAGE):
     cars = request.app.db['cars']
     results = []
-    async for car in cars.find():
-        results.append(car)
+    cursor = cars.find().sort('brand').limit(limit).skip((page - 1) * limit)
+    total_documents = await cars.count_documents({})
+    has_more = total_documents > (page * limit)
+    async for document in cursor:
+        results.append(document)
+    return CarCollectionPagination(
+        cars=results,
+        page=page,
+        has_more=has_more,
+    )
+
+    # async for car in cars.find():
+    #     results.append(car)
     # this line would be the replacement for 3 lines
     # return CarCollection( cars=await cars.find().to_list(1000) )
-    return CarCollection(cars=results)
+    # return CarCollection(cars=results)
 
 
 @router.get('/{id}',
