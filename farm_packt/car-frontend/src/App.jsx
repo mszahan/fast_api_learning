@@ -14,6 +14,7 @@ import NewCar from "./pages/NewCar.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import SingleCar from "./pages/SingleCar.jsx";
 import carsLoader from "./components/carsLoader.js";
+import Login from "./pages/Login.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
