@@ -1,27 +1,33 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router";
+import {
+  createBrowserRouter,
+  Route,
+  createRoutesFromElements,
+  RouterProvider,
+} from "react-router";
+
+import RootLayout from "./layout/RootLayout.jsx";
+
 import Home from "./pages/Home.jsx";
 import Car from "./pages/Car.jsx";
 import NewCar from "./pages/NewCar.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import SingleCar from "./pages/SingleCar.jsx";
-import Login from "./pages/Login.jsx";
-import NavBar from "./pages/NavBar.jsx";
+import carsLoader from "./components/carsLoader.js";
 
-function App() {
-  return (
-    <BrowserRouter>
-      <NavBar />
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="cars" element={<Car />} />
-        <Route path="login" element={<Login />} />
-        <Route path="new-car" element={<NewCar />} />
-        <Route path="cars/:id" element={<SingleCar />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  );
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<RootLayout />}>
+      <Route index element={<Home />} />
+      <Route path="cars" element={<Car />} loader={carsLoader} />
+      <Route path="login" element={<Login />} />
+      <Route path="new-car" element={<NewCar />} />
+      <Route path="cars/:id" element={<SingleCar />} />
+      <Route path="*" element={<NotFound />} />
+    </Route>
+  )
+);
+
+export default function App() {
+  return <RouterProvider router={router} />;
 }
-
-export default App;
