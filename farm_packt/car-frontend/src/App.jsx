@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound.jsx";
 import SingleCar from "./pages/SingleCar.jsx";
 import carsLoader from "./components/carsLoader.js";
 import Login from "./pages/Login.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -30,5 +31,9 @@ const router = createBrowserRouter(
 );
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />;
+    </AuthProvider>
+  );
 }
