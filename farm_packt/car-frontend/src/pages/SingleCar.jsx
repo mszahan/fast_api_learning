@@ -1,7 +1,11 @@
+import { useLoaderData } from "react-router";
+import CarCard from "../components/CarCard";
+
 const SingleCar = () => {
+  const { car } = useLoaderData();
   return (
     <div>
-      <h1 className="text-3xl font-bold">SingleCar</h1>
+      <CarCard car={car} />
     </div>
   );
 };
