@@ -9,3 +9,4 @@ PyJWT
 python-multipart
 openai
 resend
+passlib
