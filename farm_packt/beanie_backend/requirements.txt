@@ -1,0 +1,11 @@
+fastapi
+fastapi_cors
+beanie
+bcrypt
+cloudinary
+uvicorn
+pydantic-settings 
+PyJWT
+python-multipart
+openai
+resend
