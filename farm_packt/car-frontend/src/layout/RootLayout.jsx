@@ -11,6 +11,7 @@ const RootLayout = () => {
           <div className="flex flex-row space-x-3 gap-4">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/cars">Cars</NavLink>
+            <NavLink to="/new-car">Add cars</NavLink>
             {user && <NavLink to="/new-car">New Car</NavLink>}
           </div>
           <div>

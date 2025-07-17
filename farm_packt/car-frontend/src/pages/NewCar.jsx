@@ -1,7 +1,9 @@
+import CarForm from "../components/CarForm";
+
 const NewCar = () => {
   return (
     <div>
-      <h1 className="text-3xl font-bold">NewCar</h1>
+      <CarForm />
     </div>
   );
 };

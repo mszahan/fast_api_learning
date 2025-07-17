@@ -24,9 +24,10 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="cars" element={<Car />} loader={carsLoader} />
       <Route path="login" element={<Login />} />
-      <Route element={<AuthRequired />}>
+      {/* <Route element={<AuthRequired />}>
         <Route path="new-car" element={<NewCar />} />
-      </Route>
+      </Route> */}
+      <Route path="new-car" element={<NewCar />} />
       <Route path="cars/:id" element={<SingleCar />} />
       <Route path="*" element={<NotFound />} />
     </Route>
