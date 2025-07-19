@@ -9,4 +9,4 @@ PyJWT
 python-multipart
 openai
 resend
-passlib
+"passlib[bcrypt]"

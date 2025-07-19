@@ -1,4 +1,4 @@
-from typing import list
+from typing import List
 import cloudinary
 from beanie import PydanticObjectId, WriteRules
 from cloudinary import uploader  # noqa: F401
@@ -23,7 +23,7 @@ cloudinary.config(
 router = APIRouter()
 
 
-@router.get('/', response_model=list[Car])
+@router.get('/', response_model=List[Car])
 async def get_cars():
     cars = await Car.find_all().to_list()
     return cars
