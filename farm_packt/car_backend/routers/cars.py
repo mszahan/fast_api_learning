@@ -71,24 +71,31 @@ async def add_car(
     return await cars.find_one({'_id': inserted.inserted_id})
 
 
-@router.get('/',
-            response_description='List all cars, paginated',
-            response_model=CarCollectionPagination,
-            response_model_by_alias=False,
-            )
-async def list_cars(request: Request, page: int = 1, limit: int = CARS_PER_PAGE):
-    cars = request.app.db['cars']
+
+@router.get(
+    "/",
+    response_description="List all cars, paginated",
+    response_model=CarCollectionPagination,
+    response_model_by_alias=False,
+)
+async def list_cars(
+    request: Request,
+    # user=Depends(auth_handler.auth_wrapper),
+    page: int = 1,
+    limit: int = CARS_PER_PAGE,
+):
+    cars = request.app.db["cars"]
+
     results = []
-    cursor = cars.find().sort('brand').limit(limit).skip((page - 1) * limit)
+
+    cursor = cars.find().sort("brand").limit(limit).skip((page - 1) * limit)
+
     total_documents = await cars.count_documents({})
-    has_more = total_documents > (page * limit)
+    has_more = total_documents > limit * page
     async for document in cursor:
         results.append(document)
-    return CarCollectionPagination(
-        cars=results,
-        page=page,
-        has_more=has_more,
-    )
+
+    return CarCollectionPagination(cars=results, page=page, has_more=has_more)
 
     # async for car in cars.find():
     #     results.append(car)

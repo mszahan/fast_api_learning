@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 class User(Document):
     username: str = Field(min_length=3, max_length=50)
-    password: str = Field(min_length=6, max_length=30)
+    password: str = Field(min_length=6, max_length=128)
     email: str
     created: datetime = Field(default_factory=datetime.now)
 

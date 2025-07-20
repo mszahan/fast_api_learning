@@ -1,4 +1,8 @@
 from time import sleep
+import resend
+from config import BaseConfig
+
+settings = BaseConfig()
 
 
 def delayed_task(username: str) -> None:
