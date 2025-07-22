@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from typing import Any
+from models import Book, BookResponse, UserIn, UserOut, BaseUser, CreateUser
 
 
 app = FastAPI()
@@ -39,3 +41,29 @@ async def read_file(file_path: str):
         'file_path': file_path,
         'message': 'File path received successfully',
     }
+
+
+@app.post('/book')
+async def create_book(book: Book):
+    return book
+
+
+@app.get('/allbooks', response_model=list[BookResponse])
+# async def read_all_books() -> list[BookResponse]:
+async def read_all_books():
+    return [
+        {'title': 'Sherlock Holmes', 'author': 'Arthur Conan Doyle'},
+        {'title': '1984', 'author': 'George Orwell'},
+    ]
+
+
+# use different response models for input and output to hide the password
+@app.post('/user', response_model=UserOut)
+async def create_user(user: UserIn) -> Any:
+    return user
+
+
+# another way to use different response models for input and output
+@app.post('/user/create')
+async def create_user(user: CreateUser) -> BaseUser:
+    return user
