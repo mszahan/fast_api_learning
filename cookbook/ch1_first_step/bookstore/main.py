@@ -1,9 +1,27 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from typing import Any
 from models import Book, BookResponse, UserIn, UserOut, BaseUser, CreateUser
 
 
+class UnicornException(Exception):
+    def __init__(self, name: str):
+        self.name = name
+
+
 app = FastAPI()
+
+# setting custom response
+
+
+@app.exception_handler(UnicornException)
+async def unicorn_exception_handler(request: Request, exc: UnicornException):
+    return JSONResponse(
+        status_code=418,
+        content={
+            'message': f'Unicorns are not real: {exc.name}',
+        }
+    )
 
 
 @app.get('/books/{book_id}')
@@ -67,3 +85,11 @@ async def create_user(user: UserIn) -> Any:
 @app.post('/user/create')
 async def create_user(user: CreateUser) -> BaseUser:
     return user
+
+
+# raising custom exception
+@app.get('/unicorns/{name}')
+async def get_unicorn(name: str):
+    if name == 'yelo':
+        raise UnicornException(name=name)
+    return {'unicorn_name': name, 'message': 'Unicorn is real!'}
