@@ -1,7 +1,8 @@
 from typing import Optional
 from fastapi import FastAPI, HTTPException, status
-from models import Task, TaskWithID, UpdateTask
-from operations import read_all_tasks, read_task, create_task, modify_task, remove_task
+from models import Task, TaskWithID, UpdateTask, TaskV2WithID
+from operations import (read_all_tasks, read_task, create_task,
+                        modify_task, remove_task, read_all_tasks_v2)
 
 
 app = FastAPI()
@@ -14,6 +15,12 @@ def get_tasks(status: Optional[str] = None, title: Optional[str] = None):
         tasks = [task for task in tasks if task.status == status]
     if title:
         tasks = [task for task in tasks if task.title == title]
+    return tasks
+
+
+@app.get('/v2/tasks', response_model=list[TaskV2WithID])
+def get_tasks_v2():
+    tasks = read_all_tasks_v2()
     return tasks
 
 
