@@ -5,7 +5,11 @@ from operations import (read_all_tasks, read_task, create_task,
                         modify_task, remove_task, read_all_tasks_v2)
 
 
-app = FastAPI()
+app = FastAPI(
+    title='Task Manager API',
+    description='This is a task management API',
+    version='0.1.0'
+)
 
 
 @app.get('/tasks', response_model=list[TaskWithID])
