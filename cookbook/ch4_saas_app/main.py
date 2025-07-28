@@ -6,6 +6,7 @@ from db_connection import get_engine, get_session
 from models import Base
 from operations import add_user
 from response import ResponseCreateUser, UserCreateBody, UserCreateResponse
+import security
 
 
 @asynccontextmanager
@@ -15,6 +16,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(security.router)
 
 
 @app.post('register/user',
