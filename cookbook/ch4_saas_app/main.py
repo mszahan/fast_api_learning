@@ -6,12 +6,13 @@ from db_connection import get_engine, get_session
 from models import Base
 from operations import add_user
 from response import ResponseCreateUser, UserCreateBody, UserCreateResponse
+from third_party_login import resolve_github_token
 import security
 import premium_access
 import rbac
 import github_login
 import mfa
-from third_party_login import resolve_github_token
+import api_key
 
 
 @asynccontextmanager
@@ -26,6 +27,7 @@ app.include_router(premium_access.router)
 app.include_router(rbac.router)
 app.include_router(github_login.router)
 app.include_router(mfa.router)
+app.include_router(api_key.router)
 
 
 @app.post('/register/user',
