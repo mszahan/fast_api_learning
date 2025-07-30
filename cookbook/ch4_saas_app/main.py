@@ -9,6 +9,8 @@ from response import ResponseCreateUser, UserCreateBody, UserCreateResponse
 import security
 import premium_access
 import rbac
+import github_login
+from third_party_login import resolve_github_token
 
 
 @asynccontextmanager
@@ -21,6 +23,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(security.router)
 app.include_router(premium_access.router)
 app.include_router(rbac.router)
+app.include_router(github_login.router)
 
 
 @app.post('register/user',
@@ -44,3 +47,19 @@ def register(user: UserCreateBody,
         email=user.email
     )
     return {'message': 'user created', 'user': user_response}
+
+
+@app.get(
+    "/home",
+    responses={
+        status.HTTP_403_FORBIDDEN: {
+            "description": "token not valid"
+        }
+    },
+)
+def homepage(
+    user: UserCreateResponse = Depends(
+        resolve_github_token
+    ),
+):
+    return {"message": f"logged in {user.username} !"}
