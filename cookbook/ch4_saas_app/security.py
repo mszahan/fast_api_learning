@@ -1,11 +1,11 @@
-import datetime
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from models import User
 from email_validator import validate_email, EmailNotValidError
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from jose import jwt, JWTError
+from jose import ExpiredSignatureError, JWTError, jwt
 from operations import pwd_context, get_user
 from db_connection import get_session
 
@@ -20,16 +20,7 @@ def authenticate_user(
         username_or_email: str,
         password: str,
 ) -> User | None:
-    try:
-        validate_email(username_or_email)
-        query_filter = User.email
-    except EmailNotValidError:
-        query_filter = User.username
-    user = (
-        session.query(User)
-        .filter(query_filter == username_or_email)
-        .first()
-    )
+    user = get_user(session, username_or_email)
     if not user or not pwd_context.verify(password, user.hashed_password):
         return
     return user
@@ -37,21 +28,41 @@ def authenticate_user(
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + \
+        timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def decode_access_token(token: str, session: Session) -> User | None:
+def decode_access_token(token: str, session: Session) -> User:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get('sub')
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+            options={"verify_aud": False},
+        )
+        username: str | None = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     except JWTError:
-        return
-    if not username:
-        return
+        raise credentials_exception
+
     user = get_user(session, username)
+    if user is None:
+        raise credentials_exception
     return user
 
 
@@ -91,11 +102,6 @@ def read_user_me(
     session: Session = Depends(get_session),
 ):
     user = decode_access_token(token, session)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-        )
     return {
         'description': f'{user.username} authorized'
     }

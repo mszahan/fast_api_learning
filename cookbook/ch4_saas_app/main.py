@@ -10,6 +10,7 @@ import security
 import premium_access
 import rbac
 import github_login
+import mfa
 from third_party_login import resolve_github_token
 
 
@@ -24,9 +25,10 @@ app.include_router(security.router)
 app.include_router(premium_access.router)
 app.include_router(rbac.router)
 app.include_router(github_login.router)
+app.include_router(mfa.router)
 
 
-@app.post('register/user',
+@app.post('/register/user',
           status_code=status.HTTP_201_CREATED,
           response_model=ResponseCreateUser,
           responses={

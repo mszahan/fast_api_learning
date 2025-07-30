@@ -18,11 +18,6 @@ def get_current_user(
         token: Annotated[str, Depends(oauth2_scheme)],
         session: Session = Depends(get_session),) -> UserCreateRequestWithRole:
     user = decode_access_token(token, session)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Invalid authentication credentials',
-        )
     return UserCreateRequestWithRole(
         username=user.username,
         email=user.email,
