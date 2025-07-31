@@ -1,0 +1,6 @@
+time 2025-07-31 16:31:05, INFO: method: GET,call: /,ip: 127.0.0.1
+time 2025-07-31 16:31:06, INFO: method: GET,call: /favicon.ico,ip: 127.0.0.1
+time 2025-07-31 16:31:16, INFO: method: GET,call: /docs,ip: 127.0.0.1
+time 2025-07-31 16:31:16, INFO: method: GET,call: /openapi.json,ip: 127.0.0.1
+time 2025-07-31 16:31:25, INFO: method: GET,call: /home,ip: 127.0.0.1
+time 2025-07-31 16:32:25, INFO: method: GET,call: /item/1,ip: 127.0.0.1

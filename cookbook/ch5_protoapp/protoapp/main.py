@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from protoapp.database import SessionLocal, Item
+from protoapp.logging import client_logger
 
 
 def get_db():
@@ -40,3 +41,14 @@ async def get_item(item_id: int, db: Session = Depends(get_db)):
     if item is None:
         raise HTTPException(status_code=404, detail='Item not found')
     return item
+
+
+@app.middleware('http')
+async def log_requests(request: Request, call_next):
+    client_logger.info(
+        f'method: {request.method},'
+        f'call: {request.url.path},'
+        f'ip: {request.client.host}'
+    )
+    response = await call_next(request)
+    return response
