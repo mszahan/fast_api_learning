@@ -1,7 +1,7 @@
 from sqlalchemy import select, update, delete, text, and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.database import Ticket
+from app.database import Ticket, TicketDetails
 
 
 async def create_ticket(
@@ -73,6 +73,25 @@ async def update_ticket(
 
     async with db_session as session:
         result = await session.execute(query)
+        await session.commit()
+        if result.rowcount == 0:
+            return False
+    return True
+
+
+async def update_ticket_details(
+        db_session: AsyncSession,
+        ticket_id: int,
+        updating_ticket_details: dict
+) -> bool:
+    ticket_query = update(TicketDetails).where(
+        TicketDetails.ticket_id == ticket_id
+    )
+    if updating_ticket_details != {}:
+        return False
+    ticket_query = ticket_query.values(**updating_ticket_details)
+    async with db_session as session:
+        result = await session.execute(ticket_query)
         await session.commit()
         if result.rowcount == 0:
             return False
