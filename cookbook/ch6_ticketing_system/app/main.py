@@ -6,8 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import Base
 from app.db_connection import get_db_session, get_engine
-from app.operations import (create_ticket, get_ticket, get_all_tickets_for_show,
-                            update_ticket_price, update_ticket, delete_ticket)
+from app.operations import (add_sponsor_to_event, create_sponsor, create_ticket, get_ticket, get_all_tickets_for_show,
+                            update_ticket_price, update_ticket, delete_ticket,
+                            create_event)
 
 
 @asynccontextmanager
@@ -26,6 +27,11 @@ class TicketRequest(BaseModel):
     price: float | None
     show: str | None
     user: str | None
+
+
+class TicketDetailsUpdateRequest(BaseModel):
+    seat: str | None = None
+    ticket_type: str | None = None
 
 
 class TicketUpdateRequest(BaseModel):
@@ -126,3 +132,45 @@ async def get_tickets_for_show(
         db_session, show
     )
     return tickets
+
+
+@app.post('/event', response_model=dict[str, int])
+async def create_event_route(
+    db_session: Annotated[AsyncSession, Depends(get_db_session)],
+    event_name: str,
+    nb_tickets: int | None = 0
+):
+    event_id = await create_event(db_session, event_name, nb_tickets)
+    return {'event_id': event_id}
+
+
+@app.post('/sponsors/{sponsor_name}', response_model=dict[str, int])
+async def register_sponsor(db_session: Annotated[AsyncSession, Depends(get_db_session)],
+                           sponsor_name: str):
+    sponsor_id = await create_sponsor(db_session, sponsor_name)
+    if not sponsor_id:
+        raise HTTPException(
+            status_code=400, detail='Sponsor not created'
+        )
+    return {'sponsor_id': sponsor_id}
+
+
+@app.post("/event/{event_id}/sponsor/{sponsor_id}")
+async def register_sponsor_amount_contribution(
+    db_session: Annotated[
+        AsyncSession, Depends(get_db_session)
+    ],
+    sponsor_id: int,
+    event_id: int,
+    amount: float | None = 0,
+):
+    registered = await add_sponsor_to_event(
+        db_session, event_id, sponsor_id, amount
+    )
+    if not registered:
+        raise HTTPException(
+            status_code=400,
+            detail="Contribution not registered",
+        )
+
+    return {"detail": "Contribution registered"}

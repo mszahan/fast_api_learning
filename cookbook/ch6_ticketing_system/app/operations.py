@@ -115,7 +115,7 @@ async def delete_ticket(
         return True
 
 
-async def creat_event(
+async def create_event(
         db_session: AsyncSession,
         event_name: str,
         nb_tickets: int | None = 0,
