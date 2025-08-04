@@ -1,3 +1,4 @@
+from jose import ExpiredSignatureError
 from sqlalchemy import Column, Float, ForeignKey, Table
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -58,3 +59,12 @@ class Sponsorship(Base):
     sponsor_id: Mapped[int] = mapped_column(
         ForeignKey('sponsors.id'), primary_key=True)
     amount: Mapped[float] = mapped_column(nullable=False, default=0)
+
+
+class CreditCard(Base):
+    __tablename__ = 'credit_cards'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    number: Mapped[str] = mapped_column(unique=True)
+    expiration_date: Mapped[str]
+    cvv: Mapped[str]
+    card_holder_name: Mapped[str]
