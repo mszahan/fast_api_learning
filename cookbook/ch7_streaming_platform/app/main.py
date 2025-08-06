@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 from bson import ObjectId
 from pydantic import BaseModel
@@ -9,11 +10,17 @@ from app.database import mongo_database
 
 
 ENCODERS_BY_TYPE[ObjectId] = str
+logger = logging.getLogger('uvicorn')
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await ping_mongo_db_server()
+    db = mongo_database()
+    # create_index method will create an index based on the release_year field sorted
+    # in descending mode because of the -1 value
+    await db.songs.create_index({'album.release_year': -1})
+    await db.songs.create_index({"artist": "text"})
     yield
 
 
@@ -135,3 +142,42 @@ async def get_playlist(playlist_id: str, db=Depends(mongo_database)):
         'name': playlist['name'],
         'songs': songs
     }
+
+
+@app.get('/songs/{year}')
+async def get_songs_by_year(year: int, db=Depends(mongo_database)):
+    query = db.songs.find({'album.release_year': year})
+    # just for loggin the use of index or not
+    explained_query = await query.explain()
+    logger.info(
+        'Index used: %s',
+        explained_query.get('queryPlanner', {}).get('winningPlan', {}).get(
+            'inputStage', {}).get('indexName', 'No index used')
+    )
+    # end of logging
+    songs = await query.to_list(None)
+    if not songs:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Songs not found'
+        )
+    return songs
+
+
+@app.get("/songs/artist")
+async def get_songs_by_artist(
+    artist: str, db=Depends(mongo_database)
+):
+    query = db.songs.find(
+        {"$text": {"$search": artist}}
+    )
+    explained_query = await query.explain()
+    logger.info(
+        "Index used: %s",
+        explained_query.get("queryPlanner", {})
+        .get("winningPlan", {})
+        .get("indexName", "No index used"),
+    )
+
+    songs = await query.to_list(None)
+    return songs
