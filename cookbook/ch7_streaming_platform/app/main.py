@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from bson import ObjectId
+from pydantic import BaseModel
 
 from fastapi import FastAPI, Body, Depends, HTTPException, status
 from fastapi.encoders import ENCODERS_BY_TYPE
@@ -17,6 +18,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+
+class Playlist(BaseModel):
+    name: str
+    songs: list[str] = []
 
 
 @app.post('/songs')
@@ -90,3 +96,42 @@ async def delete_song(song_id: str, db=Depends(mongo_database)):
             detail='Song not found'
         )
     return {'message': 'Song deleted successfully'}
+
+
+@app.post('/playlist')
+async def create_playlist(
+    playlist: Playlist = Body(
+        example={
+            'name': 'My playlist',
+            'songs': ['song_id',],
+        }
+    ),
+    db=Depends(mongo_database)
+):
+    result = await db.playlists.insert_one(playlist.model_dump())
+    return {'message': 'Playlist created successfully', 'id': str(result.inserted_id)}
+
+
+@app.get('/playlist/{playlist_id}')
+async def get_playlist(playlist_id: str, db=Depends(mongo_database)):
+    playlist = await db.playlists.find_one(
+        {
+            '_id': ObjectId(playlist_id)
+            if ObjectId.is_valid(playlist_id)
+            else None
+        }
+    )
+    if not playlist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Playlist not found'
+        )
+    songs = await db.songs.find({
+        '_id': {
+            '$in': [ObjectId(song_id) for song_id in playlist['songs']]
+        }
+    }).to_list(None)
+    return {
+        'name': playlist['name'],
+        'songs': songs
+    }
