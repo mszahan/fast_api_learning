@@ -16,6 +16,7 @@ logger = logging.getLogger('uvicorn')
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await ping_mongo_db_server()
+    # await ping_elastisearch()
     db = mongo_database()
     # create_index method will create an index based on the release_year field sorted
     # in descending mode because of the -1 value
