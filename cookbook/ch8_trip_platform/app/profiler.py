@@ -15,6 +15,6 @@ class ProfileEndpontMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         if profiler.is_running:
             profiler.stop()
-            profiler.write_html(os.getcwd + '/profile.html')
+            profiler.write_html(os.getcwd() + '/profile.html')
             profiler.start()
         return response

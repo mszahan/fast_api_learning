@@ -2,6 +2,7 @@ from babel import Locale, negotiate_locale
 from babel.numbers import get_currency_name
 from typing import Annotated
 from fastapi import Header, APIRouter, Request, Depends
+from app.rate_limiter import limiter
 
 router = APIRouter(tags=['Localized Content Endpoints'])
 
@@ -39,6 +40,7 @@ home_page_content = {
 
 
 @router.get('/homepage')
+@limiter.limit('2/minute')
 async def home(request: Request,
                language: Annotated[resolve_accept_language, Depends()]):
     return {'message': home_page_content[language]}
