@@ -2,9 +2,12 @@ from typing import Annotated
 from fastapi import FastAPI, Depends
 from app.dependencies import time_range, select_category, check_coupon
 from app.middleware import ClientInfoMiddleware
+from app import internationalization
 
 app = FastAPI()
 
+
+app.include_router(internationalization.router)
 
 app.add_middleware(ClientInfoMiddleware)
 
