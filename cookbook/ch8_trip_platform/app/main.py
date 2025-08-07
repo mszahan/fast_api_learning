@@ -1,8 +1,12 @@
 from typing import Annotated
 from fastapi import FastAPI, Depends
 from app.dependencies import time_range, select_category, check_coupon
+from app.middleware import ClientInfoMiddleware
 
 app = FastAPI()
+
+
+app.add_middleware(ClientInfoMiddleware)
 
 
 @app.get('/v1/trips')
