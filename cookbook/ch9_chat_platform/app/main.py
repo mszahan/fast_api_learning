@@ -1,7 +1,9 @@
 import logging
+from typing import Annotated
 from fastapi import (FastAPI, WebSocket, WebSocketDisconnect,
-                     WebSocketException, status)
+                     WebSocketException, status, Depends)
 from app.chat import router as chat_router
+from app.security import get_username_from_token
 
 
 logger = logging.getLogger('uvicorn')
@@ -38,3 +40,14 @@ async def we_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         logger.warning('Connection closed by client')
     # await websocket.close()
+
+
+@app.websocket('/secured-ws')
+async def secured_websocket(
+    websocket: WebSocket,
+    username: Annotated[get_username_from_token, Depends()]
+):
+    await websocket.accept()
+    await websocket.send_text(f'Welcome {username}')
+    async for data in websocket.iter_text():
+        await websocket.send_text(f'You wrote: {data}')
