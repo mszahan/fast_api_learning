@@ -3,6 +3,7 @@ from fastapi import FastAPI, Body
 from starlette.middleware import Middleware
 from middleware.request_middleware import HashBodyMiddleware
 from middleware.asgi_middleware import ASGIMiddleware
+from middleware.response_middleware import HeaderResponseMiddleware
 
 
 logger = logging.getLogger('uvicorn')
@@ -16,6 +17,11 @@ app = FastAPI(
 )
 
 app.add_middleware(HashBodyMiddleware, allowed_paths=['/send'])
+app.add_middleware(HeaderResponseMiddleware,
+                   headers=(
+                       ('new-header', 'fastapi-cookbook'),
+                       ('another-header', 'another-value')
+                   ))
 
 
 @app.get('/')
