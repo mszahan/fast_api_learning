@@ -1,6 +1,11 @@
-from fastapi import FastAPI
+import logging
+from fastapi import FastAPI, Body
 from starlette.middleware import Middleware
+from middleware.request_middleware import HashBodyMiddleware
 from middleware.asgi_middleware import ASGIMiddleware
+
+
+logger = logging.getLogger('uvicorn')
 
 
 app = FastAPI(
@@ -10,7 +15,15 @@ app = FastAPI(
     ]
 )
 
+app.add_middleware(HashBodyMiddleware, allowed_paths=['/send'])
+
 
 @app.get('/')
 async def read_root():
     return {'Hello': 'World'}
+
+
+@app.post('/send')
+async def send(message: str = Body()):
+    logger.info(f'Message: {message}')
+    return {'message': message}
