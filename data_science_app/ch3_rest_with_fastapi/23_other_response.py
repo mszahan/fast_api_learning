@@ -1,5 +1,6 @@
+from pathlib import Path
 from fastapi import FastAPI, status
-from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, FileResponse
 
 
 app = FastAPI()
@@ -33,3 +34,10 @@ async def redirect():
 @app.get('/custom-redirect')
 async def custom_redirect():
     return RedirectResponse('new-url', status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+
+@app.get('/cat')
+async def get_cat():
+    root_directory = Path(__file__).parent.parent
+    picture_path = root_directory / 'assests' / 'cat.jpg'
+    return FileResponse(picture_path)
