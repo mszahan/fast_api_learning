@@ -42,7 +42,7 @@ async def get_post_or_404(
 @app.post('/posts', response_model=PostRead, status_code=status.HTTP_201_CREATED)
 async def create_post(post_create: PostCreate,
                       session: AsyncSession = Depends(get_async_session)) -> Post:
-    post = Post(**post_create.model_dump())
+    post = Post(**post_create.model_dump(), comments=[])
     session.add(post)
     await session.commit()
     return post
