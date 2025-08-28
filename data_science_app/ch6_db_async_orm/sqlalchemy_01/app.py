@@ -2,10 +2,11 @@ import contextlib
 from collections.abc import Sequence
 from fastapi import FastAPI, Depends, status, Query, HTTPException
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_01.database import get_async_session, create_all_tables
-from sqlalchemy_01.schemas import PostRead, PostCreate, PostPartialUpdate
-from sqlalchemy_01.models import Post
+from sqlalchemy_01.schemas import PostRead, PostCreate, PostPartialUpdate, CommentCreate, CommentRead
+from sqlalchemy_01.models import Post, Comment
 
 
 @contextlib.asynccontextmanager
@@ -27,7 +28,8 @@ async def pagination(
 async def get_post_or_404(
     id: int, session: AsyncSession = Depends(get_async_session)
 ) -> Post:
-    select_query = select(Post).where(Post.id == id)
+    select_query = select(Post).options(
+        selectinload(Post.comments)).where(Post.id == id)
     result = await session.execute(select_query)
     post = result.scalar_one_or_none()
 
@@ -77,3 +79,14 @@ async def delete_post(post: Post = Depends(get_post_or_404),
                       session: AsyncSession = Depends(get_async_session)):
     await session.delete(post)
     await session.commit()
+
+
+@app.post('/posts/{id}/comments', response_model=CommentRead,
+          status_code=status.HTTP_201_CREATED,)
+async def create_comment(comment_create: CommentCreate,
+                         post: Post = Depends(get_post_or_404),
+                         session: AsyncSession = Depends(get_async_session)) -> Comment:
+    comment = Comment(**comment_create.model_dump(), post=post)
+    session.add(comment)
+    await session.commit()
+    return comment
