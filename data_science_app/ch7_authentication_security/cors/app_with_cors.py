@@ -10,7 +10,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
     # Only for the sake of the example. Remove this in your own project.
-    max_age=-1,
+    # max_age=-1,
 )
 
 
