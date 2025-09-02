@@ -25,3 +25,15 @@ class User(Base):
     email: Mapped[str] = mapped_column(
         String(1024), index=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(1024), nullable=False)
+
+
+class AccessToken(Base):
+    __tablename__ = "access_tokens"
+
+    user_id:  Mapped[int] = mapped_column(
+        ForeignKey('users.id'), nullable=False)
+    user: Mapped[User] = relationship('User', lazy='joined')
+    access_token: Mapped[str] = mapped_column(
+        String(1024), primary_key=True, default=generate_token)
+    expiration_date: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=get_expiration_date)
