@@ -54,7 +54,7 @@ def create_hero(hero: Hero, session: SessionDep) -> Hero:
     return hero
 
 
-@app.get('heroes/')
+@app.get('/heroes/')
 def read_heroes(
     session: SessionDep,
     offset: int = 0,
@@ -69,6 +69,7 @@ def read_hero(hero_id: int, session: SessionDep) -> Hero:
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(status_code=404, detail='Hero not found')
+    return hero
 
 
 @app.delete('/heroes/{hero_id}')
