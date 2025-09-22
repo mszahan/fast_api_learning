@@ -10,6 +10,7 @@ dependencies = [
     "passlib[bcrypt]>=1.7.4",
     "pyjwt>=2.10.1",
     "python-multipart>=0.0.20",
+    "sqlmodel>=0.0.25",
 ]
 
 [dependency-groups]
